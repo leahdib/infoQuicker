@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Generate QR codes for URLs, text, and more. Free and easy to use.">
+    <title>QR Code Generator - Infoquicker</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="index.html">⚡ Infoquicker</a>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html#tools">Tools</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container tool-page">
+        <a href="index.html" class="back-link">← Back to Tools</a>
+        
+        <div class="tool-header">
+            <h1>QR Code Generator</h1>
+            <p>Create QR codes for URLs, text, and more</p>
+        </div>
+
+        <!-- <div class="ad-container">
+            <div class="ad-placeholder">
+                <p style="color: #999; font-size: 12px;">Advertisement</p>
+            </div>
+        </div> -->
+
+        <div class="tool-content">
+            <div class="form-group">
+                <label>QR Code Type</label>
+                <select id="qrType">
+                    <option value="url">Website URL</option>
+                    <option value="text">Plain Text</option>
+                    <option value="email">Email Address</option>
+                    <option value="phone">Phone Number</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label id="inputLabel">Enter URL</label>
+                <input type="text" id="qrInput" placeholder="https://example.com">
+            </div>
+
+            <div class="form-group">
+                <label>Size</label>
+                <select id="qrSize">
+                    <option value="128">Small (128px)</option>
+                    <option value="256" selected>Medium (256px)</option>
+                    <option value="512">Large (512px)</option>
+                </select>
+            </div>
+
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <button class="btn" onclick="generateQR()">Generate QR Code</button>
+            </div>
+
+            <div id="qrcode" style="display: none;"></div>
+            <div id="result"></div>
+        </div>
+
+        <div class="tool-content" style="margin-top: 2rem;">
+            <h3>How to Generate QR Codes</h3>
+            <ol style="line-height: 1.8; color: #e5e7eb; padding-left: 1.5rem;">
+                <li>Select the type of QR code you want to create</li>
+                <li>Enter the content (URL, text, email, or phone number)</li>
+                <li>Choose the size of the QR code</li>
+                <li>Click "Generate QR Code"</li>
+                <li>Download your QR code as a PNG image</li>
+            </ol>
+            <p style="margin-top: 1rem; color: #e5e7eb; font-size: 0.9rem;">
+                ✓ All processing happens in your browser<br>
+                ✓ Free and unlimited QR code generation<br>
+                ✓ High quality PNG output
+            </p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Infoquicker. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const qrType = document.getElementById('qrType');
+        const qrInput = document.getElementById('qrInput');
+        const inputLabel = document.getElementById('inputLabel');
+        const qrcode = document.getElementById('qrcode');
+        const result = document.getElementById('result');
+
+        qrType.addEventListener('change', () => {
+            const type = qrType.value;
+            switch(type) {
+                case 'url':
+                    inputLabel.textContent = 'Enter URL';
+                    qrInput.placeholder = 'https://example.com';
+                    qrInput.type = 'url';
+                    break;
+                case 'text':
+                    inputLabel.textContent = 'Enter Text';
+                    qrInput.placeholder = 'Your text here';
+                    qrInput.type = 'text';
+                    break;
+                case 'email':
+                    inputLabel.textContent = 'Enter Email Address';
+                    qrInput.placeholder = 'email@example.com';
+                    qrInput.type = 'email';
+                    break;
+                case 'phone':
+                    inputLabel.textContent = 'Enter Phone Number';
+                    qrInput.placeholder = '+1234567890';
+                    qrInput.type = 'tel';
+                    break;
+            }
+            qrInput.value = '';
+        });
+
+        function generateQR() {
+            const input = qrInput.value.trim();
+            if (!input) {
+                alert('Please enter some content for the QR code');
+                return;
+            }
+
+            const type = qrType.value;
+            const size = parseInt(document.getElementById('qrSize').value);
+
+            let qrContent = input;
+            if (type === 'email') {
+                qrContent = `mailto:${input}`;
+            } else if (type === 'phone') {
+                qrContent = `tel:${input}`;
+            }
+
+            // Clear previous QR code
+            qrcode.innerHTML = '';
+            qrcode.style.display = 'flex';
+
+            // Generate new QR code
+            new QRCode(qrcode, {
+                text: qrContent,
+                width: size,
+                height: size,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            // Wait for QR code to be generated, then create download button
+            setTimeout(() => {
+                const canvas = qrcode.querySelector('canvas');
+                if (canvas) {
+                    const dataUrl = canvas.toDataURL('image/png');
+                    
+                    result.innerHTML = `
+                        <div class="result">
+                            <h3>✓ QR Code Generated!</h3>
+                            <p style="margin: 1rem 0;">Your QR code is ready to download.</p>
+                            <a href="${dataUrl}" download="qrcode.png" class="btn btn-secondary">
+                                Download QR Code
+                            </a>
+                        </div>
+                    `;
+                }
+            }, 100);
+        }
+
+        // Allow Enter key to generate
+        qrInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                generateQR();
+            }
+        });
+    </script>
+</body>
+</html>

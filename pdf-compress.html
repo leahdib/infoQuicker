@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Compress PDF files to reduce file size for free. Fast and secure.">
+    <title>Compress PDF - Infoquicker</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="index.html">⚡ Infoquicker</a>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html#tools">Tools</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container tool-page">
+        <a href="index.html" class="back-link">← Back to Tools</a>
+        
+        <div class="tool-header">
+            <h1>Compress PDF</h1>
+            <p>Reduce PDF file size while maintaining quality</p>
+        </div>
+
+        <!-- <div class="ad-container">
+            <div class="ad-placeholder">
+                <p style="color: #999; font-size: 12px;">Advertisement</p>
+            </div>
+        </div> -->
+
+        <div class="tool-content">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon" style="font-size: 3rem; margin-bottom: 1rem;">🗜️</div>
+                <h3>Click or drag a PDF file here</h3>
+                <p style="color: #6b7280; margin-top: 0.5rem;">Select a PDF file to compress</p>
+                <input type="file" id="fileInput" accept=".pdf">
+                <button class="btn" onclick="document.getElementById('fileInput').click()" style="margin-top: 1rem;">
+                    Select PDF File
+                </button>
+            </div>
+
+            <div id="fileInfo"></div>
+            <div id="progress" style="display: none;">
+                <div class="progress">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <p style="text-align: center; color: #6b7280; margin-top: 0.5rem;">Compressing PDF...</p>
+            </div>
+            <div id="result"></div>
+        </div>
+
+        <div class="tool-content" style="margin-top: 2rem;">
+            <h3>How to Compress PDF</h3>
+            <ol style="line-height: 1.8; color: #e5e7eb; padding-left: 1.5rem;">
+                <li>Click "Select PDF File" or drag and drop your PDF</li>
+                <li>The compression will start automatically</li>
+                <li>Download your compressed PDF file</li>
+            </ol>
+            <p style="margin-top: 1rem; color: #e5e7eb; font-size: 0.9rem;">
+                ✓ All processing happens in your browser<br>
+                ✓ Your files are never uploaded to any server<br>
+                ✓ Completely free and secure
+            </p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Infoquicker. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const { PDFDocument } = PDFLib;
+        
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInfo = document.getElementById('fileInfo');
+        const progress = document.getElementById('progress');
+        const progressBar = document.getElementById('progressBar');
+        const result = document.getElementById('result');
+
+        fileInput.addEventListener('change', handleFile);
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files[0]?.type === 'application/pdf') {
+                fileInput.files = e.dataTransfer.files;
+                handleFile();
+            }
+        });
+
+        async function handleFile() {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const originalSize = file.size;
+            fileInfo.innerHTML = `
+                <div class="file-item">
+                    <span>📄 ${file.name} (${formatFileSize(originalSize)})</span>
+                </div>
+            `;
+
+            progress.style.display = 'block';
+            result.innerHTML = '';
+            
+            try {
+                progressBar.style.width = '30%';
+                
+                const arrayBuffer = await file.arrayBuffer();
+                const pdfDoc = await PDFDocument.load(arrayBuffer);
+                
+                progressBar.style.width = '60%';
+
+                // Save with compression
+                const compressedPdfBytes = await pdfDoc.save({
+                    useObjectStreams: true,
+                    addDefaultPage: false,
+                    objectsPerTick: 50
+                });
+
+                progressBar.style.width = '100%';
+                
+                const compressedSize = compressedPdfBytes.length;
+                const reduction = ((originalSize - compressedSize) / originalSize * 100).toFixed(1);
+                
+                const blob = new Blob([compressedPdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+
+                progress.style.display = 'none';
+                
+                const savings = reduction > 0 ? 
+                    `Reduced by ${reduction}% (saved ${formatFileSize(originalSize - compressedSize)})` :
+                    'File is already optimized';
+
+                result.innerHTML = `
+                    <div class="result">
+                        <h3>✓ PDF Compressed Successfully!</h3>
+                        <div class="stats">
+                            <div class="stat">
+                                <div class="stat-value">${formatFileSize(originalSize)}</div>
+                                <div class="stat-label">Original Size</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${formatFileSize(compressedSize)}</div>
+                                <div class="stat-label">Compressed Size</div>
+                            </div>
+                        </div>
+                        <p style="margin: 1rem 0; color: #10b981; font-weight: 600;">${savings}</p>
+                        <a href="${url}" download="${file.name.replace('.pdf', '-compressed.pdf')}" class="btn btn-secondary">
+                            Download Compressed PDF
+                        </a>
+                    </div>
+                `;
+            } catch (error) {
+                progress.style.display = 'none';
+                result.innerHTML = `
+                    <div class="result error">
+                        <h3>Error</h3>
+                        <p>Failed to compress PDF. Please make sure the file is a valid PDF document.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+    </script>
+</body>
+</html>

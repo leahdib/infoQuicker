@@ -1,0 +1,560 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #3b82f6;
+    --primary-dark: #2563eb;
+    --secondary: #3b82f6;
+    --accent: #06b6d4;
+    --text: #e5e7eb;
+    --text-light: #9ca3af;
+    --bg: #0f172a;
+    --bg-light: #1e293b;
+    --bg-card: #1e293b;
+    --border: #334155;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-lg: 0 20px 25px rgba(0,0,0,0.4);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--bg-light);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Navigation */
+.navbar {
+    background: rgba(30, 41, 59, 0.8);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border);
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 20px;
+}
+
+.nav-brand a {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #E64833;
+    text-decoration: none;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-menu a {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.nav-menu a:hover {
+    color: #E64833;
+}
+
+/* Hero */
+.hero {
+    background: linear-gradient(135deg, #1e293b 0%, #3b82f6 50%, #8b5cf6 100%);
+    color: white;
+    padding: 4rem 0;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+/* Tools Section */
+.tools-section {
+    margin: 3rem 0;
+}
+
+.tools-section h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: var(--text);
+}
+
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.tool-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.tool-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.tool-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.tool-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+}
+
+.tool-card p {
+    color: var(--text-light);
+    font-size: 0.95rem;
+}
+
+/* Features */
+.features {
+    margin: 4rem 0;
+    padding: 3rem 0;
+    text-align: center;
+}
+
+.features h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: var(--text);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.feature h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.feature p {
+    color: var(--text-light);
+}
+
+/* Ad Container */
+.ad-container {
+    margin: 2rem 0;
+    text-align: center;
+}
+
+.ad-placeholder {
+    background: var(--bg);
+    border: 2px dashed var(--border);
+    padding: 2rem;
+    border-radius: 8px;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Footer */
+footer {
+    background: var(--bg-card);
+    color: var(--text);
+    padding: 2rem 0;
+    text-align: center;
+    margin-top: 4rem;
+    border-top: 1px solid var(--border);
+}
+
+footer p {
+    margin: 0.5rem 0;
+    opacity: 0.8;
+}
+
+/* Tool Page Styles */
+.tool-page {
+    padding: 3rem 0;
+}
+
+.tool-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.tool-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.tool-header p {
+    font-size: 1.1rem;
+    color: var(--text-light);
+}
+
+.tool-content {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: var(--shadow-lg);
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    border: 1px solid var(--border);
+}
+
+.upload-area {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 3rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: var(--bg);
+}
+
+.upload-area:hover {
+    border-color: var(--primary);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.upload-area.dragover {
+    border-color: var(--primary);
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin: 0.5rem;
+}
+
+.btn:hover {
+    background: var(--primary-dark);
+}
+
+.btn:disabled {
+    background: var(--border);
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: var(--secondary);
+}
+
+.btn-secondary:hover {
+    background: var(--accent);
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.file-list {
+    margin: 1rem 0;
+}
+
+.file-item {
+    background: var(--bg);
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 0.5rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--border);
+}
+
+.progress {
+    height: 8px;
+    background: var(--bg);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--primary);
+    transition: width 0.3s;
+}
+
+.result {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.error {
+    background: #fef2f2;
+    border-color: #ef4444;
+    color: #991b1b;
+}
+
+textarea {
+    width: 100%;
+    min-height: 200px;
+    padding: 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    resize: vertical;
+    background: var(--bg);
+    color: var(--text);
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.stat {
+    background: var(--bg);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid var(--border);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #E64833;
+}
+
+.stat-label {
+    color: var(--text);
+    font-size: 0.9rem;
+}
+
+#qrcode {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    font-size: 1rem;
+    margin: 0.5rem 0;
+    background: var(--bg);
+    color: var(--text);
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+label {
+    display: block;
+    margin: 1rem 0 0.5rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.form-group {
+    margin: 1.5rem 0;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 2rem;
+    color: #E64833;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+    
+    .hero p {
+        font-size: 1rem;
+    }
+    
+    .nav-menu {
+        gap: 1rem;
+    }
+    
+    .tools-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tool-content {
+        padding: 1.5rem;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text: #e5e7eb;
+        --text-light: #9ca3af;
+        --bg: #1f2937;
+        --bg-light: #111827;
+        --border: #374151;
+        --shadow: 0 1px 3px rgba(0,0,0,0.3);
+        --shadow-lg: 0 10px 25px rgba(0,0,0,0.4);
+    }
+    
+    body {
+        background: var(--bg-light);
+        color: var(--text);
+    }
+    
+    .navbar {
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .tool-card {
+        background: var(--bg);
+        border-color: var(--border);
+    }
+    
+    .tool-card:hover {
+        background: #374151;
+    }
+    
+    .tool-content {
+        background: var(--bg);
+        border: 1px solid var(--border);
+    }
+    
+    .upload-area {
+        background: #1f2937;
+        border-color: var(--border);
+    }
+    
+    .upload-area:hover,
+    .upload-area.dragover {
+        background: #374151;
+        border-color: var(--primary);
+    }
+    
+    .file-item {
+        background: #374151;
+    }
+    
+    .stat {
+        background: #1f2937;
+    }
+    
+    textarea,
+    input[type="text"],
+    input[type="number"],
+    select {
+        background: #1f2937;
+        border-color: var(--border);
+        color: var(--text);
+    }
+    
+    .ad-placeholder {
+        background: #1f2937;
+        border-color: var(--border);
+    }
+    
+    .feature {
+        background: var(--bg);
+        padding: 1.5rem;
+        border-radius: 8px;
+    }
+    
+    .result {
+        background: #1f2937 !important;
+        border-color: var(--secondary) !important;
+    }
+    
+    .result.error {
+        background: #7f1d1d !important;
+        border-color: #ef4444 !important;
+    }
+    
+    /* Better text contrast in dark mode - override inline styles */
+    .tool-content ol,
+    .tool-content ul,
+    .tool-content p,
+    .tool-content li {
+        color: var(--text) !important;
+    }
+    
+    .tool-content h3,
+    .tool-content h4 {
+        color: var(--text);
+    }
+    
+    /* Fix upload area text */
+    .upload-area h3,
+    .upload-area p {
+        color: var(--text) !important;
+    }
+    
+    /* Fix file list text */
+    .file-item span,
+    .file-item p {
+        color: var(--text) !important;
+    }
+}

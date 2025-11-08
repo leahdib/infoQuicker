@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert images between JPG, PNG, and WebP formats for free.">
+    <title>Convert Image - Infoquicker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="index.html">⚡ Infoquicker</a>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html#tools">Tools</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container tool-page">
+        <a href="index.html" class="back-link">← Back to Tools</a>
+        
+        <div class="tool-header">
+            <h1>Convert Image Format</h1>
+            <p>Convert between JPG, PNG, and WebP formats</p>
+        </div>
+
+        <!-- <div class="ad-container">
+            <div class="ad-placeholder">
+                <p style="color: #999; font-size: 12px;">Advertisement</p>
+            </div>
+        </div> -->
+
+        <div class="tool-content">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon" style="font-size: 3rem; margin-bottom: 1rem;">🔄</div>
+                <h3>Click or drag an image here</h3>
+                <p style="color: #6b7280; margin-top: 0.5rem;">Supports JPG, PNG, and WebP</p>
+                <input type="file" id="fileInput" accept="image/*">
+                <button class="btn" onclick="document.getElementById('fileInput').click()" style="margin-top: 1rem;">
+                    Select Image
+                </button>
+            </div>
+
+            <div id="controls"></div>
+            <div id="preview"></div>
+            <div id="result"></div>
+        </div>
+
+        <div class="tool-content" style="margin-top: 2rem;">
+            <h3>How to Convert Images</h3>
+            <ol style="line-height: 1.8; color: #e5e7eb; padding-left: 1.5rem;">
+                <li>Click "Select Image" or drag and drop your image</li>
+                <li>Choose the format you want to convert to</li>
+                <li>Adjust the quality if needed</li>
+                <li>Click "Convert Image" and download the result</li>
+            </ol>
+            <p style="margin-top: 1rem; color: #e5e7eb; font-size: 0.9rem;">
+                ✓ Supports JPG, PNG, and WebP formats<br>
+                ✓ All processing happens in your browser<br>
+                ✓ Completely free
+            </p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Infoquicker. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const controls = document.getElementById('controls');
+        const preview = document.getElementById('preview');
+        const result = document.getElementById('result');
+
+        let originalImage = null;
+        let originalFile = null;
+
+        fileInput.addEventListener('change', handleFile);
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files[0]?.type.startsWith('image/')) {
+                fileInput.files = e.dataTransfer.files;
+                handleFile();
+            }
+        });
+
+        function handleFile() {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            originalFile = file;
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    originalImage = img;
+
+                    const currentFormat = file.type.split('/')[1].toUpperCase();
+
+                    controls.innerHTML = `
+                        <div style="background: #f9fafb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                            <p style="color: #6b7280;">Current format: ${currentFormat}</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Convert to:</label>
+                            <select id="formatSelect">
+                                <option value="image/jpeg">JPG</option>
+                                <option value="image/png">PNG</option>
+                                <option value="image/webp">WebP</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Quality: <span id="qualityValue">90</span>%</label>
+                            <input type="range" id="qualitySlider" min="1" max="100" value="90" 
+                                style="width: 100%; margin-top: 0.5rem;">
+                            <p style="color: #6b7280; font-size: 0.9rem; margin-top: 0.5rem;">
+                                (Only applies to JPG and WebP)
+                            </p>
+                        </div>
+                        <div style="text-align: center; margin-top: 1.5rem;">
+                            <button class="btn" onclick="convertImage()">Convert Image</button>
+                        </div>
+                    `;
+
+                    document.getElementById('qualitySlider').addEventListener('input', (e) => {
+                        document.getElementById('qualityValue').textContent = e.target.value;
+                    });
+
+                    preview.innerHTML = '';
+                    result.innerHTML = '';
+                };
+                img.src = e.target.result;
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        function convertImage() {
+            if (!originalImage) return;
+
+            const format = document.getElementById('formatSelect').value;
+            const quality = parseInt(document.getElementById('qualitySlider').value) / 100;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = originalImage.width;
+            canvas.height = originalImage.height;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(originalImage, 0, 0);
+
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const formatName = format.split('/')[1].toUpperCase();
+                const extension = format === 'image/jpeg' ? 'jpg' : format.split('/')[1];
+
+                preview.innerHTML = `
+                    <div style="text-align: center; margin: 2rem 0;">
+                        <h4>Preview:</h4>
+                        <img src="${url}" style="max-width: 100%; max-height: 400px; margin-top: 1rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    </div>
+                `;
+
+                result.innerHTML = `
+                    <div class="result">
+                        <h3>✓ Image Converted Successfully!</h3>
+                        <div class="stats">
+                            <div class="stat">
+                                <div class="stat-value">${formatFileSize(originalFile.size)}</div>
+                                <div class="stat-label">Original Size</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${formatFileSize(blob.size)}</div>
+                                <div class="stat-label">New Size</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${formatName}</div>
+                                <div class="stat-label">New Format</div>
+                            </div>
+                        </div>
+                        <a href="${url}" download="${originalFile.name.replace(/\.[^.]+$/, '')}.${extension}" class="btn btn-secondary">
+                            Download ${formatName} Image
+                        </a>
+                    </div>
+                `;
+            }, format, quality);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+    </script>
+</body>
+</html>

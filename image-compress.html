@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Compress images to reduce file size for free. Supports JPG, PNG, and WebP.">
+    <title>Compress Image - Infoquicker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="index.html">⚡ Infoquicker</a>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html#tools">Tools</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container tool-page">
+        <a href="index.html" class="back-link">← Back to Tools</a>
+        
+        <div class="tool-header">
+            <h1>Compress Image</h1>
+            <p>Reduce image file size while maintaining quality</p>
+        </div>
+
+        <!-- <div class="ad-container">
+            <div class="ad-placeholder">
+                <p style="color: #999; font-size: 12px;">Advertisement</p>
+            </div>
+        </div> -->
+
+        <div class="tool-content">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon" style="font-size: 3rem; margin-bottom: 1rem;">🖼️</div>
+                <h3>Click or drag an image here</h3>
+                <p style="color: #6b7280; margin-top: 0.5rem;">Supports JPG, PNG, and WebP</p>
+                <input type="file" id="fileInput" accept="image/*">
+                <button class="btn" onclick="document.getElementById('fileInput').click()" style="margin-top: 1rem;">
+                    Select Image
+                </button>
+            </div>
+
+            <div id="controls"></div>
+            <div id="preview"></div>
+            <div id="result"></div>
+        </div>
+
+        <div class="tool-content" style="margin-top: 2rem;">
+            <h3>How to Compress Images</h3>
+            <ol style="line-height: 1.8; color: #e5e7eb; padding-left: 1.5rem;">
+                <li>Click "Select Image" or drag and drop your image</li>
+                <li>Adjust the quality slider to control compression level</li>
+                <li>Preview the compressed image</li>
+                <li>Download your compressed image</li>
+            </ol>
+            <p style="margin-top: 1rem; color: #e5e7eb; font-size: 0.9rem;">
+                ✓ All processing happens in your browser<br>
+                ✓ Your images never leave your device<br>
+                ✓ Completely free
+            </p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Infoquicker. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const controls = document.getElementById('controls');
+        const preview = document.getElementById('preview');
+        const result = document.getElementById('result');
+
+        let originalFile = null;
+        let originalSize = 0;
+
+        fileInput.addEventListener('change', handleFile);
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files[0]?.type.startsWith('image/')) {
+                fileInput.files = e.dataTransfer.files;
+                handleFile();
+            }
+        });
+
+        function handleFile() {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            originalFile = file;
+            originalSize = file.size;
+
+            controls.innerHTML = `
+                <div class="form-group">
+                    <label>Quality: <span id="qualityValue">80</span>%</label>
+                    <input type="range" id="qualitySlider" min="1" max="100" value="80" 
+                        style="width: 100%; margin-top: 0.5rem;">
+                    <p style="color: #6b7280; font-size: 0.9rem; margin-top: 0.5rem;">
+                        Lower quality = smaller file size
+                    </p>
+                </div>
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <button class="btn" onclick="compressImage()">Compress Image</button>
+                </div>
+            `;
+
+            document.getElementById('qualitySlider').addEventListener('input', (e) => {
+                document.getElementById('qualityValue').textContent = e.target.value;
+            });
+
+            preview.innerHTML = '';
+            result.innerHTML = '';
+        }
+
+        async function compressImage() {
+            if (!originalFile) return;
+
+            const quality = parseInt(document.getElementById('qualitySlider').value) / 100;
+
+            try {
+                const img = new Image();
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    img.src = e.target.result;
+                };
+
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+
+                    canvas.toBlob((blob) => {
+                        const compressedSize = blob.size;
+                        const reduction = ((originalSize - compressedSize) / originalSize * 100).toFixed(1);
+                        const url = URL.createObjectURL(blob);
+
+                        preview.innerHTML = `
+                            <div style="text-align: center; margin: 2rem 0;">
+                                <h4>Preview:</h4>
+                                <img src="${url}" style="max-width: 100%; max-height: 400px; margin-top: 1rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            </div>
+                        `;
+
+                        result.innerHTML = `
+                            <div class="result">
+                                <h3>✓ Image Compressed Successfully!</h3>
+                                <div class="stats">
+                                    <div class="stat">
+                                        <div class="stat-value">${formatFileSize(originalSize)}</div>
+                                        <div class="stat-label">Original Size</div>
+                                    </div>
+                                    <div class="stat">
+                                        <div class="stat-value">${formatFileSize(compressedSize)}</div>
+                                        <div class="stat-label">Compressed Size</div>
+                                    </div>
+                                    <div class="stat">
+                                        <div class="stat-value">${reduction}%</div>
+                                        <div class="stat-label">Reduction</div>
+                                    </div>
+                                </div>
+                                <a href="${url}" download="${originalFile.name.replace(/\.[^.]+$/, '-compressed.jpg')}" class="btn btn-secondary">
+                                    Download Compressed Image
+                                </a>
+                            </div>
+                        `;
+                    }, 'image/jpeg', quality);
+                };
+
+                reader.readAsDataURL(originalFile);
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="result error">
+                        <h3>Error</h3>
+                        <p>Failed to compress image. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+    </script>
+</body>
+</html>

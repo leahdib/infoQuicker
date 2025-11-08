@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Count words, characters, sentences, and paragraphs for free. Instant results.">
+    <title>Word Counter - Infoquicker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="index.html">⚡ Infoquicker</a>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html#tools">Tools</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container tool-page">
+        <a href="index.html" class="back-link">← Back to Tools</a>
+        
+        <div class="tool-header">
+            <h1>Word Counter</h1>
+            <p>Count words, characters, sentences, and paragraphs</p>
+        </div>
+<!-- 
+        <div class="ad-container">
+            <div class="ad-placeholder">
+                <p style="color: #999; font-size: 12px;">Advertisement</p>
+            </div>
+        </div> -->
+
+        <div class="tool-content">
+            <div class="stats" id="stats">
+                <div class="stat">
+                    <div class="stat-value" id="wordCount">0</div>
+                    <div class="stat-label">Words</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="charCount">0</div>
+                    <div class="stat-label">Characters</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="charNoSpaceCount">0</div>
+                    <div class="stat-label">Characters (no spaces)</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="sentenceCount">0</div>
+                    <div class="stat-label">Sentences</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="paragraphCount">0</div>
+                    <div class="stat-label">Paragraphs</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="readingTime">0</div>
+                    <div class="stat-label">Reading Time (min)</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Type or paste your text here:</label>
+                <textarea id="textInput" placeholder="Start typing or paste your text here..."></textarea>
+            </div>
+
+            <div style="text-align: center; margin-top: 1rem;">
+                <button class="btn" onclick="clearText()" style="background: #6b7280;">Clear Text</button>
+            </div>
+        </div>
+
+        <div class="tool-content" style="margin-top: 2rem;">
+            <h3>Features</h3>
+            <ul style="line-height: 1.8; color: #e5e7eb; padding-left: 1.5rem;">
+                <li><strong>Word Count:</strong> Total number of words in your text</li>
+                <li><strong>Character Count:</strong> Total characters including spaces</li>
+                <li><strong>Character Count (no spaces):</strong> Characters excluding spaces</li>
+                <li><strong>Sentence Count:</strong> Number of sentences</li>
+                <li><strong>Paragraph Count:</strong> Number of paragraphs</li>
+                <li><strong>Reading Time:</strong> Estimated time to read the text (based on 200 words per minute)</li>
+            </ul>
+            <p style="margin-top: 1rem; color: #e5e7eb; font-size: 0.9rem;">
+                ✓ Real-time counting as you type<br>
+                ✓ All processing happens in your browser<br>
+                ✓ Completely free
+            </p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Infoquicker. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const textInput = document.getElementById('textInput');
+        const wordCount = document.getElementById('wordCount');
+        const charCount = document.getElementById('charCount');
+        const charNoSpaceCount = document.getElementById('charNoSpaceCount');
+        const sentenceCount = document.getElementById('sentenceCount');
+        const paragraphCount = document.getElementById('paragraphCount');
+        const readingTime = document.getElementById('readingTime');
+
+        textInput.addEventListener('input', updateCounts);
+
+        function updateCounts() {
+            const text = textInput.value;
+
+            // Word count
+            const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+            wordCount.textContent = words.length;
+
+            // Character counts
+            charCount.textContent = text.length;
+            charNoSpaceCount.textContent = text.replace(/\s/g, '').length;
+
+            // Sentence count
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            sentenceCount.textContent = sentences.length;
+
+            // Paragraph count
+            const paragraphs = text.split(/\n\n+/).filter(p => p.trim().length > 0);
+            paragraphCount.textContent = paragraphs.length || (text.trim().length > 0 ? 1 : 0);
+
+            // Reading time (assuming 200 words per minute)
+            const minutes = Math.ceil(words.length / 200);
+            readingTime.textContent = words.length > 0 ? minutes : 0;
+        }
+
+        function clearText() {
+            textInput.value = '';
+            updateCounts();
+            textInput.focus();
+        }
+
+        // Initial update
+        updateCounts();
+    </script>
+</body>
+</html>

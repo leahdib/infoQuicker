@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Split PDF files and extract specific pages for free.">
+    <title>Split PDF - Infoquicker</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="index.html">⚡ Infoquicker</a>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html#tools">Tools</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container tool-page">
+        <a href="index.html" class="back-link">← Back to Tools</a>
+        
+        <div class="tool-header">
+            <h1>Split PDF</h1>
+            <p>Extract specific pages from your PDF document</p>
+        </div>
+
+        <!-- <div class="ad-container">
+            <div class="ad-placeholder">
+                <p style="color: #999; font-size: 12px;">Advertisement</p>
+            </div>
+        </div> -->
+
+        <div class="tool-content">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon" style="font-size: 3rem; margin-bottom: 1rem;">✂️</div>
+                <h3>Click or drag a PDF file here</h3>
+                <p style="color: #6b7280; margin-top: 0.5rem;">Select a PDF file to split</p>
+                <input type="file" id="fileInput" accept=".pdf">
+                <button class="btn" onclick="document.getElementById('fileInput').click()" style="margin-top: 1rem;">
+                    Select PDF File
+                </button>
+            </div>
+
+            <div id="pdfInfo"></div>
+            <div id="splitOptions"></div>
+            <div id="result"></div>
+        </div>
+
+        <div class="tool-content" style="margin-top: 2rem;">
+            <h3>How to Split PDF</h3>
+            <ol style="line-height: 1.8; color: #e5e7eb; padding-left: 1.5rem;">
+                <li>Click "Select PDF File" or drag and drop your PDF</li>
+                <li>Enter the page numbers you want to extract (e.g., "1-3, 5, 8-10")</li>
+                <li>Click "Split PDF" to extract the pages</li>
+                <li>Download your new PDF with the selected pages</li>
+            </ol>
+            <p style="margin-top: 1rem; color: #e5e7eb; font-size: 0.9rem;">
+                ✓ All processing happens in your browser<br>
+                ✓ Your files never leave your device<br>
+                ✓ Completely free
+            </p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Infoquicker. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const { PDFDocument } = PDFLib;
+        
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const pdfInfo = document.getElementById('pdfInfo');
+        const splitOptions = document.getElementById('splitOptions');
+        const result = document.getElementById('result');
+
+        let currentPdf = null;
+        let pageCount = 0;
+
+        fileInput.addEventListener('change', handleFile);
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files[0]?.type === 'application/pdf') {
+                fileInput.files = e.dataTransfer.files;
+                handleFile();
+            }
+        });
+
+        async function handleFile() {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                currentPdf = await PDFDocument.load(arrayBuffer);
+                pageCount = currentPdf.getPageCount();
+
+                pdfInfo.innerHTML = `
+                    <div class="file-item">
+                        <span>📄 ${file.name} (${pageCount} pages)</span>
+                    </div>
+                `;
+
+                splitOptions.innerHTML = `
+                    <div class="form-group">
+                        <label>Pages to Extract</label>
+                        <input type="text" id="pageRange" placeholder="e.g., 1-3, 5, 8-10" />
+                        <p style="color: #6b7280; font-size: 0.9rem; margin-top: 0.5rem;">
+                            Enter page numbers or ranges. Examples: "1-5" for pages 1 to 5, "1,3,5" for specific pages, "1-3,7-9" for multiple ranges.
+                        </p>
+                    </div>
+                    <div style="text-align: center; margin-top: 1.5rem;">
+                        <button class="btn" onclick="splitPdf()">Split PDF</button>
+                    </div>
+                `;
+
+                result.innerHTML = '';
+            } catch (error) {
+                pdfInfo.innerHTML = `
+                    <div class="result error">
+                        <p>Failed to load PDF. Please make sure the file is a valid PDF document.</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function splitPdf() {
+            const pageRange = document.getElementById('pageRange').value.trim();
+            if (!pageRange) {
+                alert('Please enter page numbers to extract');
+                return;
+            }
+
+            try {
+                const pages = parsePageRange(pageRange, pageCount);
+                
+                if (pages.length === 0) {
+                    throw new Error('No valid pages specified');
+                }
+
+                const newPdf = await PDFDocument.create();
+                const copiedPages = await newPdf.copyPages(currentPdf, pages);
+                copiedPages.forEach(page => newPdf.addPage(page));
+
+                const pdfBytes = await newPdf.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+
+                result.innerHTML = `
+                    <div class="result">
+                        <h3>✓ PDF Split Successfully!</h3>
+                        <p style="margin: 1rem 0;">Extracted ${pages.length} page(s) from your PDF.</p>
+                        <a href="${url}" download="split.pdf" class="btn btn-secondary">Download Split PDF</a>
+                    </div>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="result error">
+                        <h3>Error</h3>
+                        <p>${error.message || 'Invalid page range. Please check your input.'}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function parsePageRange(rangeStr, maxPages) {
+            const pages = new Set();
+            const parts = rangeStr.split(',');
+
+            for (const part of parts) {
+                const trimmed = part.trim();
+                
+                if (trimmed.includes('-')) {
+                    const [start, end] = trimmed.split('-').map(s => parseInt(s.trim()));
+                    if (isNaN(start) || isNaN(end)) continue;
+                    for (let i = Math.max(1, start); i <= Math.min(maxPages, end); i++) {
+                        pages.add(i - 1); // PDF-lib uses 0-based indexing
+                    }
+                } else {
+                    const page = parseInt(trimmed);
+                    if (!isNaN(page) && page >= 1 && page <= maxPages) {
+                        pages.add(page - 1);
+                    }
+                }
+            }
+
+            return Array.from(pages).sort((a, b) => a - b);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Merge multiple PDF files into one document for free. Fast and secure.">
+    <title>Merge PDF - Infoquicker</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="index.html">⚡ Infoquicker</a>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html#tools">Tools</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container tool-page">
+        <a href="index.html" class="back-link">← Back to Tools</a>
+        
+        <div class="tool-header">
+            <h1>Merge PDF Files</h1>
+            <p>Combine multiple PDF documents into a single file</p>
+        </div>
+
+        <!-- <div class="ad-container">
+            <div class="ad-placeholder">
+                <p style="color: #999; font-size: 12px;">Advertisement</p>
+            </div>
+        </div> -->
+
+        <div class="tool-content">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon" style="font-size: 3rem; margin-bottom: 1rem;">📄</div>
+                <h3>Click or drag PDF files here</h3>
+                <p style="color: #6b7280; margin-top: 0.5rem;">Select multiple PDF files to merge</p>
+                <input type="file" id="fileInput" accept=".pdf" multiple>
+                <button class="btn" onclick="document.getElementById('fileInput').click()" style="margin-top: 1rem;">
+                    Select PDF Files
+                </button>
+            </div>
+
+            <div id="fileList" class="file-list"></div>
+
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <button class="btn" id="mergeBtn" disabled>Merge PDFs</button>
+            </div>
+
+            <div id="result"></div>
+        </div>
+
+        <div class="tool-content" style="margin-top: 2rem;">
+            <h3>How to Merge PDFs</h3>
+            <ol style="line-height: 1.8; color: #e5e7eb; padding-left: 1.5rem;">
+                <li>Click "Select PDF Files" or drag and drop your PDF files</li>
+                <li>The files will appear in the list below</li>
+                <li>Drag files to reorder them if needed</li>
+                <li>Click "Merge PDFs" to combine them into one file</li>
+                <li>Download your merged PDF file</li>
+            </ol>
+            <p style="margin-top: 1rem; color: #e5e7eb; font-size: 0.9rem;">
+                ✓ All processing happens in your browser - your files never leave your device<br>
+                ✓ No file size limits<br>
+                ✓ Completely free
+            </p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Infoquicker. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const { PDFDocument } = PDFLib;
+        let selectedFiles = [];
+
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileList = document.getElementById('fileList');
+        const mergeBtn = document.getElementById('mergeBtn');
+        const result = document.getElementById('result');
+
+        // File selection
+        fileInput.addEventListener('change', handleFiles);
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files).filter(f => f.type === 'application/pdf');
+            if (files.length > 0) {
+                handleFileArray(files);
+            }
+        });
+
+        function handleFiles(e) {
+            const files = Array.from(e.target.files);
+            handleFileArray(files);
+        }
+
+        function handleFileArray(files) {
+            selectedFiles = [...selectedFiles, ...files];
+            updateFileList();
+            mergeBtn.disabled = selectedFiles.length < 2;
+        }
+
+        function updateFileList() {
+            if (selectedFiles.length === 0) {
+                fileList.innerHTML = '';
+                return;
+            }
+
+            fileList.innerHTML = '<h4 style="margin-bottom: 1rem;">Selected Files:</h4>' +
+                selectedFiles.map((file, index) => `
+                    <div class="file-item">
+                        <span>📄 ${file.name}</span>
+                        <button class="btn" onclick="removeFile(${index})" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Remove</button>
+                    </div>
+                `).join('');
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFileList();
+            mergeBtn.disabled = selectedFiles.length < 2;
+        }
+
+        mergeBtn.addEventListener('click', async () => {
+            if (selectedFiles.length < 2) return;
+
+            mergeBtn.disabled = true;
+            mergeBtn.textContent = 'Merging...';
+            result.innerHTML = '';
+
+            try {
+                const mergedPdf = await PDFDocument.create();
+
+                for (const file of selectedFiles) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await PDFDocument.load(arrayBuffer);
+                    const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                    copiedPages.forEach(page => mergedPdf.addPage(page));
+                }
+
+                const mergedPdfBytes = await mergedPdf.save();
+                const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+
+                result.innerHTML = `
+                    <div class="result">
+                        <h3>✓ PDF Merged Successfully!</h3>
+                        <p style="margin: 1rem 0;">Your ${selectedFiles.length} PDF files have been merged into one document.</p>
+                        <a href="${url}" download="merged.pdf" class="btn btn-secondary">Download Merged PDF</a>
+                    </div>
+                `;
+
+                mergeBtn.textContent = 'Merge PDFs';
+                mergeBtn.disabled = false;
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="result error">
+                        <h3>Error</h3>
+                        <p>Failed to merge PDFs. Please make sure all files are valid PDF documents.</p>
+                    </div>
+                `;
+                mergeBtn.textContent = 'Merge PDFs';
+                mergeBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
